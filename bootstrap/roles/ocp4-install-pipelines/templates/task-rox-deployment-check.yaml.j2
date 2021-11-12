@@ -27,7 +27,7 @@ spec:
   steps:
 
     - name: git-clone
-      image: quay.io/rcarrata/git:v2.26.2
+      image: bitnami/git:latest
       workingDir: $(workspaces.workspace.path)
       script: |
         rm -rf git-update-digest-workdir
