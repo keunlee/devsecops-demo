@@ -9,9 +9,15 @@ DevSecOps CICD pipeline demo using several technologies such as:
 - [Openshift Advanced Cluster Security for Kubernetes](https://www.redhat.com/en/resources/advanced-cluster-security-for-kubernetes-datasheet)
 - [Openshift Container Registry](https://docs.openshift.com/container-platform/latest/registry/architecture-component-imageregistry.html)
 
-This pipeline also improve security adding:
+Vulnerability and configuration management methods included in this demo are the following:
 
-* Static application security testing (SAST), which analyzes code under development for vulnerabilities and quality issues.
+* **Static application security testing (SAST)**, which analyzes code under development for vulnerabilities and quality issues.
+* **Software composition analysis (SCA)**, which examines dependent packages included with applications, looking for known vulnerabilities and licensing issues.
+* **Interactive application security testing (IAST)** and **dynamic application security testing (DAST)** tools, which analyze running applications to find execution vulnerabilities.
+* **Configuration management** with analysis and management of application and infrastructure configurations in DevOps. Traditionally this was not used as a way to improve security. But properly managing configurations in a GitOps process can strengthen security by improving change controls, identifying configuration defects that can reduce the attack surface, and signing and tracking authorship for better accountability and opportunities to improve.
+* **Image risk** is any risk associated with a container image. This includes vulnerable dependencies, embedded secrets, bad configurations, malware, or images that are not trusted.
+
+This pipeline also improve security adding the following Open Source components:
 
 - [SonarQube](https://www.sonarqube.org/)
 - [Nexus](https://www.sonatype.com/products/repository-oss?topnav=true)
@@ -21,13 +27,7 @@ This pipeline also improve security adding:
 - [Gatling](https://gatling.io/)
 - [Zap Proxy](https://www.zaproxy.org/)
 
-Vulnerability and configuration management methods include:
-
-    Static application security testing (SAST), which analyzes code under development for vulnerabilities and quality issues.
-    Software composition analysis (SCA), which examines dependent packages included with applications, looking for known vulnerabilities and licensing issues.
-    Interactive application security testing (IAST) and dynamic application security testing (DAST) tools, which analyze running applications to find execution vulnerabilities.
-    Configuration management with analysis and management of application and infrastructure configurations in DevOps. Traditionally this was not used as a way to improve security. But properly managing configurations in a GitOps process can strengthen security by improving change controls, identifying configuration defects that can reduce the attack surface, and signing and tracking authorship for better accountability and opportunities to improve.
-    Image risk is any risk associated with a container image. This includes vulnerable dependencies, embedded secrets, bad configurations, malware, or images that are not trusted.
+* NOTE: Tested and fully working for 4.7+ OpenShift Clusters, including >=4.9!
 
 # Overview
 
@@ -126,20 +126,36 @@ You can check the `s2ijava-mgr.yaml` file for more details. We have added a step
 
 ## Prerequisites
 
+- A RHEL or Fedora box
 - Openshift Cluster 4.7+
+- `oc` binary
 - Ansible 2.7+
+- Git
 
 * [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-rhel-centos-or-fedora)
 
 * [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
 
-```
+```sh
 ansible-galaxy collection install community.kubernetes
+pip3 install kubernetes
+```
+
+Install some extra Python dependency:
+
+```sh
+pip3 install jmespath
 ```
 
 ## Bootstrap
 
 Fully automated deployment and integration of every resource and tool needed for this demo.
+
+```sh
+oc login --token=yourtoken --server=https://yourocp
+```
+
+Run the installer:
 
 ```sh
 ./install.sh
@@ -191,11 +207,3 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable at least Import
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
 
 Big thanks also to [Rodrigo Alvares](https://github.com/ralvares) that helped with their wisdom and knowledge in this demo.
-
-## TODO
-
-- Add documentation about triggers
-- Add better branching with GitHub Flow model
-- Update images for the infra (nexus, gogs, etc) with the latest versions
-- Use Nexus Operator
-- Use Quay Operator and Clair
