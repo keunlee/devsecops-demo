@@ -37,13 +37,23 @@ spec:
       image: quay.io/rcarrata/argocd:$(params.argocd-version)
       script: |
         if [ -z $ARGOCD_AUTH_TOKEN ]; then
-          yes | argocd login $ARGOCD_SERVER --username=$ARGOCD_USERNAME --password=$ARGOCD_PASSWORD;
+          argocd login $ARGOCD_SERVER --insecure --username=$ARGOCD_USERNAME --password=$ARGOCD_PASSWORD;
         fi
     - name: sync
       image: quay.io/rcarrata/argocd:$(params.argocd-version)
       script: |
-        argocd app sync $(params.application-name) --revision $(params.revision) $(params.flags)
+        if [ -z $ARGOCD_AUTH_TOKEN ]; then
+          argocd login $ARGOCD_SERVER --insecure --username=$ARGOCD_USERNAME --password=$ARGOCD_PASSWORD;
+        fi 
+
+        argocd --grpc-web app get --refresh $(params.application-name) > /dev/null && argocd --grpc-web app wait $(params.application-name) --sync --health
     - name: wait
       image: quay.io/rcarrata/argocd:$(params.argocd-version)
       script: |
-        argocd app wait $(params.application-name) --health $(params.flags)
+        FLAGS=$(params.flags)
+
+        if [ -z $ARGOCD_AUTH_TOKEN ]; then
+          argocd login $ARGOCD_SERVER --insecure --username=$ARGOCD_USERNAME --password=$ARGOCD_PASSWORD;
+        fi 
+
+        argocd app wait $(params.application-name) --insecure --health $FLAGS
