@@ -97,13 +97,15 @@ spec:
     params:
     - name: SOURCE_DIR
       value: spring-petclinic
+
   - name: apply-semver
     taskRef:
       name: openshift-client
     runAfter:
       - code-analysis
       - unit-tests
-      - dependency-report  
+      - dependency-report
+      
   - name: build-artifact
     taskRef:
       name: maven
@@ -141,58 +143,6 @@ spec:
         value: $(params.APP_IMAGE_TAG)
     workspaces:
     - name: source
-      workspace: workspace
-  - name: image-scan
-    runAfter:
-    - build-image
-    taskRef:
-      name: rox-image-scan
-      kind: ClusterTask
-    params:
-    - name: image
-      value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/spring-petclinic
-    - name: rox_api_token
-      value: roxsecrets
-    - name: rox_central_endpoint
-      value: roxsecrets
-    - name: output_format
-      value: pretty
-    - name: image_digest
-      value: $(tasks.build-image.results.IMAGE_DIGEST)
-  - name: image-check
-    runAfter:
-    - build-image
-    taskRef:
-      name: rox-image-check
-      kind: ClusterTask
-    params:
-    - name: image
-      value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/spring-petclinic
-    - name: rox_api_token
-      value: roxsecrets
-    - name: rox_central_endpoint
-      value: roxsecrets
-    - name: image_digest
-      value: $(tasks.build-image.results.IMAGE_DIGEST)
-  - name: deploy-check
-    runAfter:
-    - build-image
-    taskRef:
-      name: rox-deployment-check
-      kind: ClusterTask
-    params:
-    - name: GIT_REPOSITORY
-      value: "$(params.APP_MANIFESTS_GIT)"
-    - name: rox_api_token
-      value: roxsecrets
-    - name: rox_central_endpoint
-      value: roxsecrets
-    - name: file
-      value: deployment.yaml
-    - name: deployment_files_path
-      value: app
-    workspaces:
-    - name: workspace
       workspace: workspace
   - name: update-deployment
     runAfter:
