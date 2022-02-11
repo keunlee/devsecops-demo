@@ -127,7 +127,7 @@ spec:
     taskRef:
       name: s2i-java-11
     runAfter:
-    - release-app
+    - build-artifact
     params:
       - name: TLSVERIFY
         value: "false"
