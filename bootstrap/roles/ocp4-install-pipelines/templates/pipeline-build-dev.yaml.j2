@@ -99,6 +99,7 @@ spec:
       value: spring-petclinic
   - name: apply-semver
     taskRef:
+      kind: ClusterTask
       name: openshift-client
     runAfter:
       - code-analysis
