@@ -93,6 +93,10 @@
 #     state: present
 #     definition: "{{ lookup('template', 'gitops-argocd.yaml.j2') }}"
 
+- name: Pause for a few minutes
+  pause:
+    minutes: 2
+
 - name: Patch the CM of Openshift GitOps to add role admin by default
   command: oc patch cm/argocd-rbac-cm -n openshift-gitops --type=merge -p '{"data":{"policy.default":"role:admin"}}'
 
