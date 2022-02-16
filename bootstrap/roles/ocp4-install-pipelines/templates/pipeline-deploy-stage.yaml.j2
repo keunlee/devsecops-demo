@@ -20,8 +20,6 @@ spec:
   - name: wait-application
     taskRef:
       name: argocd-task-sync-and-wait
-    runAfter:
-      - update-deployment
     params:
       - name: application-name
         value: stage-spring-petclinic
